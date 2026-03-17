@@ -1,0 +1,46 @@
+// revi.config.js
+// Copy this file to your project root and rename it to revi.config.js
+
+export default {
+  // ── Routes ──────────────────────────────────────────────────────────────────
+  // List every route you want prerendered.
+  // ReviJs renders each one in a full browser and saves the resulting HTML.
+  routes: [
+    '/',
+    '/about',
+    '/pricing',
+    '/blog',
+    '/blog/post-1',
+    '/blog/post-2',
+  ],
+
+  // ── Engine ──────────────────────────────────────────────────────────────────
+  // 'browser'  — Standard headless Chromium. Works for most apps. (default)
+  // 'advanced' — Like browser, but also simulates scroll and injects a
+  //              <meta name="x-prerendered-by" content="revijs"> marker.
+  // 'ssr'      — Minimal-wait mode intended for frameworks with true SSR.
+  engine: 'browser',
+
+  // ── Output ──────────────────────────────────────────────────────────────────
+  // Directory where prerendered HTML files are written.
+  // Deploy this folder (or merge it with your dist/) to your CDN / host.
+  outputDir: 'dist-prerendered',
+
+  // Your built SPA. Run `npm run build` first, then `npx revijs`.
+  distDir: 'dist',
+
+  // ── Timing ──────────────────────────────────────────────────────────────────
+  // Milliseconds to wait AFTER network idle before capturing HTML.
+  // Increase this if your app fires animations or deferred fetches.
+  waitFor: 1200,
+
+  // ── Browser ─────────────────────────────────────────────────────────────────
+  // true  — Run browser in background (recommended for CI/production).
+  // false — Open a visible browser window (useful for debugging).
+  headless: true,
+
+  // ── Server ──────────────────────────────────────────────────────────────────
+  // Preferred local port for the temporary static server.
+  // ReviJs auto-increments if the port is already in use.
+  port: 4173,
+};

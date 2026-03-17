@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-prerendered/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+coverage/
+.nyc_output/

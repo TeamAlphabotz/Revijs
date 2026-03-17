@@ -1,0 +1,41 @@
+{
+  "name": "revijs",
+  "version": "0.1.0",
+  "description": "Local-first SPA prerender CLI tool — converts React/Vite apps into SEO-friendly static HTML",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "revijs": "./bin/revijs.js"
+  },
+  "scripts": {
+    "start": "node bin/revijs.js",
+    "dev": "node bin/revijs.js --debug",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  },
+  "keywords": [
+    "prerender",
+    "seo",
+    "spa",
+    "react",
+    "vite",
+    "static",
+    "headless",
+    "ssr",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.44.0",
+    "sirv": "^2.0.4",
+    "polka": "^0.5.2",
+    "picocolors": "^1.0.1",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
