@@ -35,13 +35,17 @@ Before you summon the ReviJs wizard, make sure you have these installed:
 - Built output in a `dist/` folder (or customizable)
 - Node-like environment for running the CLI
 
+
 ### Package Dependencies
 
-The `@revijs/core` package automatically installs its dependencies:
-- **puppeteer** (headless browser automation)
-- **express** (local server)
-- **fast-glob** (route discovery)
-- **dotenv** (env config)
+The `@revijs/core` package comes with these dependencies:
+- **playwright** — headless Chromium browser automation
+- **commander** — CLI argument parsing
+- **picocolors** — pretty console output
+- **polka** — lightweight HTTP server
+- **sirv** — efficient static file serving
+
+All are automatically installed with `npm install @revijs/core`
 
 ---
 
@@ -58,6 +62,7 @@ npx revijs init
 npm run build
 
 # 4️⃣  Let the prerendering begin! 🎆
+
 npx revijs
 ```
 
