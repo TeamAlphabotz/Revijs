@@ -13,7 +13,14 @@
 
 ## 🔗 Quick Links
 
-[📖 Documentation](https://teamalphabotz.github.io/Revijs/) · [🚀 Getting Started](https://teamalphabotz.github.io/Revijs/docs/getting-started.html) · [⚙️ Configuration](https://teamalphabotz.github.io/Revijs/docs/configuration.html) · [🔌 API Reference](https://teamalphabotz.github.io/Revijs/docs/api.html) · [🧩 Middleware](https://teamalphabotz.github.io/Revijs/docs/middleware.html) · [💡 Examples](https://teamalphabotz.github.io/Revijs/docs/examples.html) · [📦 npm Package](https://www.npmjs.com/package/@revijs/core) · [🐙 GitHub](https://github.com/TeamAlphabotz/Revijs)
+- 📖 [Full Documentation](https://teamalphabotz.github.io/Revijs/)
+- 🚀 [Getting Started](https://teamalphabotz.github.io/Revijs/#start)
+- ⚙️ [Configuration](https://teamalphabotz.github.io/Revijs/#config)
+- 🔌 [API Reference](https://teamalphabotz.github.io/Revijs/#api)
+- 🧩 [Middleware](https://teamalphabotz.github.io/Revijs/#middleware)
+- 💡 [Examples](https://teamalphabotz.github.io/Revijs/#examples)
+- 🐙 [GitHub Repository](https://github.com/TeamAlphabotz/Revijs)
+- 📦 [npm Package](https://www.npmjs.com/package/@revijs/core)
 
 ---
 
@@ -70,8 +77,6 @@ export default {
 };
 ```
 
-[→ Full configuration reference](https://teamalphabotz.github.io/Revijs/docs/configuration.html)
-
 ---
 
 ## 🧩 Middleware
@@ -86,8 +91,6 @@ app.use(express.static('dist'));
 app.listen(3000);
 ```
 
-[→ Middleware docs](https://teamalphabotz.github.io/Revijs/docs/middleware.html)
-
 ---
 
 ## 🤖 Programmatic API
@@ -100,8 +103,6 @@ await prerender({
   outputDir: 'dist-prerendered',
 });
 ```
-
-[→ Full API reference](https://teamalphabotz.github.io/Revijs/docs/api.html)
 
 ---
 
