@@ -1,6 +1,6 @@
 {
   "name": "@revijs/core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Local-first SPA prerender CLI — convert React/Vite apps into SEO-friendly static HTML",
   "type": "module",
   "main": "./src/index.js",
