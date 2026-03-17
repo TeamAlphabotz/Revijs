@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReviJs — SPA Prerender CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080b10;
+      --bg2: #0d1117;
+      --bg3: #161b22;
+      --border: #21262d;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --accent3: #10b981;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --code-bg: #0d1117;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: rgba(8, 11, 16, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); background: var(--bg3); }
+    .nav-links a.active { color: var(--accent2); }
+
+    .nav-cta {
+      background: var(--accent) !important;
+      color: white !important;
+      padding: 0.4rem 1rem !important;
+    }
+    .nav-cta:hover { background: #6d28d9 !important; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-glow2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);
+      top: 30%; right: 10%;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #a78bfa;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    h1 .accent { color: var(--accent); }
+    h1 .accent2 { color: var(--accent2); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 3rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
+
+    .hero-code {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: left;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+    }
+
+    .hero-code .line { display: block; padding: 0.15rem 0; }
+    .hero-code .cmd { color: var(--accent2); }
+    .hero-code .comment { color: #484f58; }
+    .hero-code .out { color: var(--accent3); }
+
+    /* ── STATS ── */
+    .stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      margin: 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 1rem 2rem;
+    }
+
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .stat-val span { color: var(--accent); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      font-weight: 600;
+    }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 560px;
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+
+    .step {
+      background: var(--bg2);
+      padding: 2rem 1.5rem;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .step:hover { background: var(--bg3); }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .step-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .feature {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: rgba(124,58,237,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .code-dots { display: flex; gap: 0.4rem; }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .code-filename {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .code-body {
+      padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-body .kw { color: #ff7b72; }
+    .code-body .str { color: #a5d6ff; }
+    .code-body .num { color: #79c0ff; }
+    .code-body .comment { color: #484f58; }
+    .code-body .prop { color: #d2a8ff; }
+    .code-body .val { color: #ffa657; }
+
+    /* ── BOT TABLE ── */
+    .bot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .bot-chip {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bot-chip::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent3);
+      flex-shrink: 0;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(6,182,212,0.05) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cta-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .cta-inner h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-inner p {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 400;
+    }
+
+    footer a { color: var(--accent2); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero > * { animation: fadeUp 0.6s ease both; }
+    .hero .badge { animation-delay: 0.1s; }
+    .hero h1 { animation-delay: 0.2s; }
+    .hero .hero-sub { animation-delay: 0.3s; }
+    .hero .hero-actions { animation-delay: 0.4s; }
+    .hero .hero-code { animation-delay: 0.5s; }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .section-inner { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="index.html">⚡ <span>Revi</span>Js</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="docs/getting-started.html">Getting Started</a></li>
+      <li><a href="docs/configuration.html">Config</a></li>
+      <li><a href="docs/api.html">API</a></li>
+      <li><a href="docs/middleware.html">Middleware</a></li>
+      <li><a href="docs/examples.html">Examples</a></li>
+      <li><a href="https://github.com/TeamAlphabotz/Revijs" class="nav-cta" target="_blank">GitHub ↗</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+    <div class="badge">⚡ v0.1.1 · @revijs/core · MIT License</div>
+    <h1>Make your <span class="accent">React</span> app<br/>visible to <span class="accent2">bots</span></h1>
+    <p class="hero-sub">ReviJs prerenders your SPA into static HTML using a headless browser. Zero cloud. Zero backend. Pure local magic.</p>
+    <div class="hero-actions">
+      <a href="docs/getting-started.html" class="btn btn-primary">Get Started →</a>
+      <a href="https://www.npmjs.com/package/@revijs/core" class="btn btn-secondary" target="_blank">npm Package ↗</a>
+    </div>
+    <div class="hero-code">
+      <span class="line comment"># install once</span>
+      <span class="line"><span class="cmd">npm</span> install @revijs/core</span>
+      <span class="line"> </span>
+      <span class="line comment"># then just run</span>
+      <span class="line"><span class="cmd">npx</span> revijs</span>
+      <span class="line"> </span>
+      <span class="line out">✔ / rendered</span>
+      <span class="line out">✔ /about rendered</span>
+      <span class="line out">✔ /blog/post-1 rendered</span>
+      <span class="line out">3 rendered → dist-prerendered/</span>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val"><span>0</span> cloud</div>
+      <div class="stat-label">Zero cloud dependency</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span>30s</span></div>
+      <div class="stat-label">Setup time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span>30+</span></div>
+      <div class="stat-label">Bots supported</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span>100</span></div>
+      <div class="stat-label">SEO score possible</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section style="background: var(--bg);">
+    <div class="section-inner">
+      <div class="section-tag">// how it works</div>
+      <h2 class="section-title">Four steps to full SEO</h2>
+      <p class="section-desc">ReviJs plugs into your existing build process. No rewrites. No new frameworks.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-icon">🏗️</div>
+          <div class="step-title">Build your app</div>
+          <div class="step-desc">Run your normal <code>npm run build</code>. ReviJs works with your existing dist/ output.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-icon">🚀</div>
+          <div class="step-title">Run ReviJs</div>
+          <div class="step-desc">Run <code>npx revijs</code>. It spins up a local server and a headless browser automatically.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-icon">📸</div>
+          <div class="step-title">Capture HTML</div>
+          <div class="step-desc">The browser visits each route, waits for data, then captures the full rendered DOM.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-icon">🤖</div>
+          <div class="step-title">Serve to bots</div>
+          <div class="step-desc">Bots get static HTML. Real users still get your smooth SPA. Best of both worlds.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section style="background: var(--bg2);">
+    <div class="section-inner">
+      <div class="section-tag">// features</div>
+      <h2 class="section-title">Everything you need</h2>
+      <p class="section-desc">Designed to be dropped into any existing React or Vite project in seconds.</p>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🖥️</div>
+          <div class="feature-title">Headless Browser Engine</div>
+          <div class="feature-desc">Powered by Playwright Chromium internally. Fully abstracted — you never install or configure it manually.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Local-First & Private</div>
+          <div class="feature-desc">Everything runs on your machine. Your code, data, and API responses never leave your server.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-title">Bot Detection Middleware</div>
+          <div class="feature-desc">Drop-in Express middleware detects 30+ crawlers and serves them prerendered HTML automatically.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⚙️</div>
+          <div class="feature-title">3 Rendering Engines</div>
+          <div class="feature-desc">Choose from <code>browser</code>, <code>advanced</code>, or <code>ssr</code> mode depending on your app's needs.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">Zero Config to Start</div>
+          <div class="feature-desc">Run <code>npx revijs init</code> to generate a starter config. One command, you're ready.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔌</div>
+          <div class="feature-title">Programmatic API</div>
+          <div class="feature-desc">Import and call <code>prerender()</code> from your own scripts for full programmatic control.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTS -->
+  <section style="background: var(--bg);">
+    <div class="section-inner">
+      <div class="section-tag">// bot detection</div>
+      <h2 class="section-title">Supported crawlers</h2>
+      <p class="section-desc">ReviJs detects all major search engines, AI crawlers, and social preview bots out of the box.</p>
+      <div class="bot-grid">
+        <div class="bot-chip">Googlebot</div>
+        <div class="bot-chip">Bingbot</div>
+        <div class="bot-chip">GPTBot</div>
+        <div class="bot-chip">ClaudeBot</div>
+        <div class="bot-chip">PerplexityBot</div>
+        <div class="bot-chip">Yandexbot</div>
+        <div class="bot-chip">Baiduspider</div>
+        <div class="bot-chip">DuckDuckBot</div>
+        <div class="bot-chip">Twitterbot</div>
+        <div class="bot-chip">LinkedInBot</div>
+        <div class="bot-chip">Slackbot</div>
+        <div class="bot-chip">Discordbot</div>
+        <div class="bot-chip">facebookexternalhit</div>
+        <div class="bot-chip">AhrefsBot</div>
+        <div class="bot-chip">SemrushBot</div>
+        <div class="bot-chip">+ more</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK CODE -->
+  <section style="background: var(--bg2);">
+    <div class="section-inner">
+      <div class="section-tag">// config</div>
+      <h2 class="section-title">Simple config file</h2>
+      <p class="section-desc">Drop a <code>revi.config.js</code> in your project root. That's all ReviJs needs.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots">
+            <div class="code-dot dot-red"></div>
+            <div class="code-dot dot-yellow"></div>
+            <div class="code-dot dot-green"></div>
+          </div>
+          <div class="code-filename">revi.config.js</div>
+          <div></div>
+        </div>
+        <div class="code-body">
+<span class="kw">export default</span> {<br/>
+&nbsp;&nbsp;<span class="comment">// Routes to prerender</span><br/>
+&nbsp;&nbsp;<span class="prop">routes</span>: [<span class="str">'/'</span>, <span class="str">'/about'</span>, <span class="str">'/blog/post-1'</span>],<br/>
+<br/>
+&nbsp;&nbsp;<span class="comment">// 'browser' | 'advanced' | 'ssr'</span><br/>
+&nbsp;&nbsp;<span class="prop">engine</span>: <span class="str">'browser'</span>,<br/>
+<br/>
+&nbsp;&nbsp;<span class="prop">outputDir</span>: <span class="str">'dist-prerendered'</span>,<br/>
+&nbsp;&nbsp;<span class="prop">distDir</span>: <span class="str">'dist'</span>,<br/>
+<br/>
+&nbsp;&nbsp;<span class="comment">// ms to wait after network idle</span><br/>
+&nbsp;&nbsp;<span class="prop">waitFor</span>: <span class="num">1200</span>,<br/>
+&nbsp;&nbsp;<span class="prop">headless</span>: <span class="num">true</span>,<br/>
+&nbsp;&nbsp;<span class="prop">port</span>: <span class="num">4173</span>,<br/>
+};
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <a href="docs/configuration.html" class="btn btn-secondary">Full config reference →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2>Ready to make Google<br/>love your app?</h2>
+      <p>Get started in 30 seconds. No credit card, no cloud, no nonsense.</p>
+      <div class="hero-actions" style="justify-content:center">
+        <a href="docs/getting-started.html" class="btn btn-primary">Read the docs →</a>
+        <a href="https://github.com/TeamAlphabotz/Revijs" class="btn btn-secondary" target="_blank">Star on GitHub ⭐</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Made with 💜 by <a href="https://github.com/TeamAlphabotz" target="_blank">AlphaBotz</a> · <a href="https://www.npmjs.com/package/@revijs/core" target="_blank">npm</a> · <a href="https://github.com/TeamAlphabotz/Revijs" target="_blank">GitHub</a> · MIT License</p>
+  </footer>
+
+</body>
+</html>
