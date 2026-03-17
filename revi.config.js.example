@@ -1,10 +1,19 @@
 // revi.config.js
-// Copy this file to your project root and rename it to revi.config.js
+// ──────────────────────────────────────────────────────────────
+// ReviJs Prerender Configuration
+// Copyright (c) 2026 AlphaBotz & Adarsh
+// GitHub: https://github.com/TeamAlphabotz
+// GitHub: https://github.com/utkarshdubey2008
+// Telegram: @alter69x, @akanesakuramori
+// This file defines routes and settings for prerendering your SPA.
+// ──────────────────────────────────────────────────────────────
+
+// Copy this file to your project root and rename to 'revi.config.js'
 
 export default {
-  // ── Routes ──────────────────────────────────────────────────────────────────
-  // List every route you want prerendered.
-  // ReviJs renders each one in a full browser and saves the resulting HTML.
+  // ── Routes ───────────────────────────────────────────────────────────────
+  // List all paths you want prerendered. ReviJs will load each route
+  // in a headless browser and capture the full HTML output.
   routes: [
     '/',
     '/about',
@@ -14,33 +23,32 @@ export default {
     '/blog/post-2',
   ],
 
-  // ── Engine ──────────────────────────────────────────────────────────────────
-  // 'browser'  — Standard headless Chromium. Works for most apps. (default)
-  // 'advanced' — Like browser, but also simulates scroll and injects a
-  //              <meta name="x-prerendered-by" content="revijs"> marker.
-  // 'ssr'      — Minimal-wait mode intended for frameworks with true SSR.
+  // ── Engine ───────────────────────────────────────────────────────────────
+  // 'browser'  — Standard headless Chromium. Works for most projects (default).
+  // 'advanced' — Like browser mode, but also scrolls and adds a
+  //              <meta name="x-prerendered-by" content="revijs"> tag.
+  // 'ssr'      — Minimal-wait mode, for frameworks with built-in SSR.
   engine: 'browser',
 
-  // ── Output ──────────────────────────────────────────────────────────────────
-  // Directory where prerendered HTML files are written.
-  // Deploy this folder (or merge it with your dist/) to your CDN / host.
+  // ── Output ───────────────────────────────────────────────────────────────
+  // Folder where prerendered HTML is saved. Deploy or merge with your SPA build.
   outputDir: 'dist-prerendered',
 
-  // Your built SPA. Run `npm run build` first, then `npx revijs`.
+  // Location of your built SPA. Run `npm run build` first, then `npx revijs`.
   distDir: 'dist',
 
-  // ── Timing ──────────────────────────────────────────────────────────────────
+  // ── Timing ──────────────────────────────────────────────────────────────
   // Milliseconds to wait AFTER network idle before capturing HTML.
-  // Increase this if your app fires animations or deferred fetches.
+  // Increase if your app uses animations or delayed data fetching.
   waitFor: 1200,
 
-  // ── Browser ─────────────────────────────────────────────────────────────────
-  // true  — Run browser in background (recommended for CI/production).
-  // false — Open a visible browser window (useful for debugging).
+  // ── Browser ─────────────────────────────────────────────────────────────
+  // true  — Browser runs in the background (recommended for CI/production).
+  // false — Opens a visible browser window (helpful for debugging).
   headless: true,
 
-  // ── Server ──────────────────────────────────────────────────────────────────
-  // Preferred local port for the temporary static server.
-  // ReviJs auto-increments if the port is already in use.
+  // ── Server ──────────────────────────────────────────────────────────────
+  // Preferred local port for the temporary server.
+  // ReviJs auto-increments if the port is busy.
   port: 4173,
 };
