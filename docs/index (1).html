@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReviJs Docs</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--bg2:#161b22;--border:#30363d;--accent:#7c3aed;--accent2:#58a6ff;--text:#e6edf3;--muted:#8b949e;--green:#3fb950}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.logo{font-weight:700;font-size:1.1rem;color:var(--text);cursor:pointer}
+.logo span{color:var(--accent)}
+.nav-links{display:flex;gap:1.25rem;list-style:none}
+.nav-links a{color:var(--muted);font-size:.875rem}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:.25rem}
+.mobile-nav{display:none;background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 1.5rem;flex-direction:column;gap:.25rem}
+.mobile-nav a{color:var(--muted);padding:.5rem 0;display:block;border-bottom:1px solid #21262d;font-size:.9rem}
+.mobile-nav a:hover{color:var(--text);text-decoration:none}
+.mobile-nav.show{display:flex}
+.wrapper{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+.page{display:none}
+.page.active{display:block}
+h1{font-size:2rem;font-weight:700;margin-bottom:.5rem}
+h2{font-size:1.3rem;font-weight:600;margin:2.5rem 0 .75rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+h3{font-size:1rem;font-weight:600;margin:1.75rem 0 .4rem;color:var(--accent2)}
+.desc{color:var(--muted);margin-bottom:2rem;font-size:.95rem}
+p{color:#c9d1d9;margin-bottom:1rem}
+ul,ol{color:#c9d1d9;padding-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:.3rem}
+strong{color:var(--text)}
+code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.82em;background:var(--bg2);border:1px solid var(--border);padding:.12em .4em;border-radius:4px;color:#79c0ff}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;font-family:'JetBrains Mono','Fira Code',monospace;font-size:.82rem;line-height:1.8;color:var(--text)}
+pre .cm{color:#6e7681}pre .kw{color:#ff7b72}pre .st{color:#a5d6ff}pre .pr{color:#d2a8ff}pre .nu{color:#79c0ff}pre .ok{color:var(--green)}pre .cmd{color:var(--accent2)}
+.note{background:#0d2137;border-left:3px solid var(--accent2);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:.88rem;color:#c9d1d9}
+.warn{background:#2d1b00;border-left:3px solid #e3b341;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:.88rem;color:#c9d1d9}
+table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.875rem}
+th{background:var(--bg2);border:1px solid var(--border);padding:.6rem .9rem;text-align:left;color:var(--muted);font-weight:600}
+td{border:1px solid var(--border);padding:.6rem .9rem;color:#c9d1d9;vertical-align:top}
+td:first-child{font-family:monospace;color:#79c0ff;font-size:.82rem}
+tr:hover td{background:var(--bg2)}
+.hero{text-align:center;padding:3rem 0 2.5rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem}
+.hero h1{font-size:2.5rem;margin-bottom:.75rem}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted);max-width:520px;margin:0 auto 1.75rem;font-size:1rem}
+.btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.55rem 1.2rem;border-radius:6px;font-size:.875rem;font-weight:600;text-decoration:none;transition:opacity .15s;cursor:pointer;border:none;font-family:inherit}
+.btn:hover{opacity:.85;text-decoration:none}
+.btn-p{background:var(--accent);color:#fff}
+.btn-g{background:#21262d;color:var(--text);border:1px solid var(--border)}
+.hero-code{display:inline-block;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-family:monospace;font-size:.82rem;margin-top:1.75rem;line-height:1.9}
+.stats{display:flex;flex-wrap:wrap;gap:1rem;margin:2rem 0}
+.stat{flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem}
+.stat-val{font-size:1.5rem;font-weight:700;color:var(--accent)}
+.stat-label{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;margin:1rem 0 1.5rem}
+.feat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem}
+.feat-title{font-weight:600;margin-bottom:.3rem;font-size:.9rem}
+.feat-desc{color:var(--muted);font-size:.82rem;line-height:1.55}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.chip{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:.25rem .65rem;font-family:monospace;font-size:.78rem;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--border);margin:2.5rem 0}
+@media(max-width:600px){.nav-links{display:none}.hamburger{display:block}h1{font-size:1.6rem}.hero h1{font-size:2rem}pre{font-size:.75rem}}
+</style>
+</head>
+<body>
+<nav>
+  <span class="logo" onclick="show('home')">⚡ <span>Revi</span>Js</span>
+  <ul class="nav-links">
+    <li><a href="#" onclick="return show('home')">Home</a></li>
+    <li><a href="#" onclick="return show('start')">Get Started</a></li>
+    <li><a href="#" onclick="return show('config')">Config</a></li>
+    <li><a href="#" onclick="return show('api')">API</a></li>
+    <li><a href="#" onclick="return show('middleware')">Middleware</a></li>
+    <li><a href="#" onclick="return show('examples')">Examples</a></li>
+    <li><a href="https://github.com/TeamAlphabotz/Revijs" target="_blank">GitHub ↗</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMobile()">☰</button>
+</nav>
+<div class="mobile-nav" id="mob">
+  <a href="#" onclick="show('home');toggleMobile()">🏠 Home</a>
+  <a href="#" onclick="show('start');toggleMobile()">🚀 Get Started</a>
+  <a href="#" onclick="show('config');toggleMobile()">⚙️ Configuration</a>
+  <a href="#" onclick="show('api');toggleMobile()">🔌 API Reference</a>
+  <a href="#" onclick="show('middleware');toggleMobile()">🧩 Middleware</a>
+  <a href="#" onclick="show('examples');toggleMobile()">💡 Examples</a>
+  <a href="https://github.com/TeamAlphabotz/Revijs" target="_blank">🐙 GitHub ↗</a>
+</div>
+<div class="wrapper">
+
+<!-- HOME -->
+<div id="home" class="page active">
+<div class="hero">
+  <h1>⚡ <span>ReviJs</span></h1>
+  <p>Local-first SPA prerender CLI — convert your React/Vite app into SEO-friendly static HTML. Zero cloud. Zero backend.</p>
+  <div class="btns">
+    <button class="btn btn-p" onclick="show('start')">Get Started →</button>
+    <a href="https://www.npmjs.com/package/@revijs/core" class="btn btn-g" target="_blank">npm ↗</a>
+    <a href="https://github.com/TeamAlphabotz/Revijs" class="btn btn-g" target="_blank">GitHub ↗</a>
+  </div>
+  <div class="hero-code">
+    <span style="color:#6e7681"># install</span><br>
+    <span style="color:#58a6ff">npm</span> install @revijs/core<br><br>
+    <span style="color:#6e7681"># run</span><br>
+    <span style="color:#58a6ff">npx</span> revijs<br><br>
+    <span style="color:#3fb950">✔ / rendered</span><br>
+    <span style="color:#3fb950">✔ /about rendered</span><br>
+    <span style="color:#3fb950">3 routes → dist-prerendered/</span>
+  </div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-val">0</div><div class="stat-label">Cloud dependency</div></div>
+  <div class="stat"><div class="stat-val">30s</div><div class="stat-label">Setup time</div></div>
+  <div class="stat"><div class="stat-val">30+</div><div class="stat-label">Bots detected</div></div>
+  <div class="stat"><div class="stat-val">MIT</div><div class="stat-label">License — free</div></div>
+</div>
+<h2>What is ReviJs?</h2>
+<p>React apps are invisible to search engines because they render HTML using JavaScript — and most bots don't run JavaScript. ReviJs fixes this by opening your app in a real headless browser, waiting for everything to load, and saving the final HTML to disk.</p>
+<p>That saved HTML gets served to bots like Googlebot, GPTBot, and ClaudeBot — while real users continue to get your normal React app. No code changes needed in your app.</p>
+<h2>How it works</h2>
+<ol>
+  <li>You run <code>npm run build</code> as normal</li>
+  <li>You run <code>npx revijs</code></li>
+  <li>ReviJs reads your <code>revi.config.js</code></li>
+  <li>For each route — starts a local server, launches headless browser, navigates, waits for network idle, captures full DOM</li>
+  <li>Saves each route as a static <code>index.html</code> file in <code>dist-prerendered/</code></li>
+  <li>You deploy — bots get static HTML, users get the SPA</li>
+</ol>
+<h2>Features</h2>
+<div class="features">
+  <div class="feat"><div class="feat-title">🖥️ Headless Browser Engine</div><div class="feat-desc">Powered by Playwright Chromium internally. You never install or configure it manually.</div></div>
+  <div class="feat"><div class="feat-title">🔒 Local-First</div><div class="feat-desc">Everything runs on your machine. No data leaves your server.</div></div>
+  <div class="feat"><div class="feat-title">🤖 Bot Middleware</div><div class="feat-desc">Optional Express middleware auto-detects bots and serves prerendered HTML.</div></div>
+  <div class="feat"><div class="feat-title">⚙️ 3 Render Engines</div><div class="feat-desc">browser, advanced, and ssr modes for different needs.</div></div>
+  <div class="feat"><div class="feat-title">🔌 Programmatic API</div><div class="feat-desc">Use <code>prerender()</code> in your own build scripts.</div></div>
+  <div class="feat"><div class="feat-title">📦 Zero Config</div><div class="feat-desc">Run <code>npx revijs init</code> to generate a starter config instantly.</div></div>
+</div>
+</div>
+
+<!-- GET STARTED -->
+<div id="start" class="page">
+<h1>Getting Started</h1>
+<p class="desc">Set up ReviJs in your existing project in under 30 seconds.</p>
+<h2>Requirements</h2>
+<ul>
+  <li><strong>Node.js</strong> v18.0.0 or higher</li>
+  <li><strong>npm</strong> v9+ (or yarn / pnpm)</li>
+  <li>A React, Vite, Vue, or Svelte SPA with a <code>dist/</code> build output</li>
+  <li>macOS, Linux, or Windows</li>
+</ul>
+<h2>Step 1 — Install</h2>
+<p>Install ReviJs. Playwright Chromium installs automatically — nothing extra needed.</p>
+<pre>npm install @revijs/core</pre>
+<div class="note">💡 The browser engine (Chromium) installs automatically via postinstall. You never need to run <code>playwright install</code> manually.</div>
+<h2>Step 2 — Create config</h2>
+<p>Auto-generate a config file:</p>
+<pre><span class="cmd">npx</span> revijs init</pre>
+<p>Or create <code>revi.config.js</code> manually:</p>
+<pre><span class="kw">export default</span> {
+  <span class="pr">routes</span>: [<span class="st">'/'</span>, <span class="st">'/about'</span>, <span class="st">'/blog/post-1'</span>],
+  <span class="pr">engine</span>: <span class="st">'browser'</span>,
+  <span class="pr">outputDir</span>: <span class="st">'dist-prerendered'</span>,
+  <span class="pr">distDir</span>: <span class="st">'dist'</span>,
+  <span class="pr">waitFor</span>: <span class="nu">1200</span>,
+  <span class="pr">headless</span>: <span class="nu">true</span>,
+};</pre>
+<h2>Step 3 — Build your app</h2>
+<pre><span class="cmd">npm</span> run build</pre>
+<h2>Step 4 — Prerender</h2>
+<pre><span class="cmd">npx</span> revijs</pre>
+<p>Expected output:</p>
+<pre><span class="ok">  ⚡ ReviJs — SPA Prerenderer
+
+  Rendering / ... ✔
+  Rendering /about ... ✔
+  Rendering /blog/post-1 ... ✔
+
+  3 rendered → dist-prerendered/</span></pre>
+<div class="warn">⚠️ Always run <code>npm run build</code> before <code>npx revijs</code>. ReviJs renders your built output, not your source files.</div>
+<h2>Output structure</h2>
+<p>Each route maps to a nested <code>index.html</code>:</p>
+<pre>/             → dist-prerendered/index.html
+/about        → dist-prerendered/about/index.html
+/blog/post-1  → dist-prerendered/blog/post-1/index.html</pre>
+</div>
+
+<!-- CONFIG -->
+<div id="config" class="page">
+<h1>Configuration</h1>
+<p class="desc">All options for <code>revi.config.js</code>. Run <code>npx revijs init</code> to generate one automatically.</p>
+<h2>Full example</h2>
+<pre><span class="kw">export default</span> {
+  <span class="pr">routes</span>: [<span class="st">'/'</span>, <span class="st">'/about'</span>, <span class="st">'/blog/post-1'</span>],
+  <span class="pr">engine</span>: <span class="st">'browser'</span>,
+  <span class="pr">outputDir</span>: <span class="st">'dist-prerendered'</span>,
+  <span class="pr">distDir</span>: <span class="st">'dist'</span>,
+  <span class="pr">waitFor</span>: <span class="nu">1200</span>,
+  <span class="pr">headless</span>: <span class="nu">true</span>,
+  <span class="pr">port</span>: <span class="nu">4173</span>,
+  <span class="pr">debug</span>: <span class="nu">false</span>,
+};</pre>
+<h2>Options</h2>
+<table>
+  <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>routes</td><td>string[]</td><td>[]</td><td>Route paths to prerender. <strong>Required.</strong></td></tr>
+    <tr><td>engine</td><td>string</td><td>'browser'</td><td>Rendering engine. See below.</td></tr>
+    <tr><td>outputDir</td><td>string</td><td>'dist-prerendered'</td><td>Where to write prerendered HTML files.</td></tr>
+    <tr><td>distDir</td><td>string</td><td>'dist'</td><td>Your built SPA directory. Must exist before running.</td></tr>
+    <tr><td>waitFor</td><td>number</td><td>1200</td><td>ms to wait after network idle. Increase if data loads slowly.</td></tr>
+    <tr><td>headless</td><td>boolean</td><td>true</td><td>Run browser hidden. Set false to watch it (useful for debugging).</td></tr>
+    <tr><td>port</td><td>number</td><td>4173</td><td>Local server port. Auto-increments if taken.</td></tr>
+    <tr><td>debug</td><td>boolean</td><td>false</td><td>Enable verbose logging. Also available as <code>--debug</code> CLI flag.</td></tr>
+  </tbody>
+</table>
+<h2>Rendering engines</h2>
+<h3>browser (default)</h3>
+<p>Standard headless Chromium. Works for 99% of React/Vite apps. Navigates to each route, waits for network idle, captures the DOM. Use this unless you have a specific reason not to.</p>
+<h3>advanced</h3>
+<p>Like browser, but also simulates page scroll to trigger lazy-loaded components. Also injects a <code>&lt;meta name="x-prerendered-by" content="revijs"&gt;</code> tag. Use this if your components only load when scrolled into view.</p>
+<h3>ssr</h3>
+<p>Minimal-wait mode for apps that already do server-side rendering. Skips the <code>waitFor</code> delay since content is already in the initial HTML.</p>
+<h2>CLI flags</h2>
+<table>
+  <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>--config &lt;path&gt;</td><td>Path to config file. Default: revi.config.js</td></tr>
+    <tr><td>--output &lt;dir&gt;</td><td>Override outputDir from config</td></tr>
+    <tr><td>--debug</td><td>Enable verbose logging</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- API -->
+<div id="api" class="page">
+<h1>Programmatic API</h1>
+<p class="desc">Use ReviJs in your own Node.js scripts instead of the CLI. Useful for custom build pipelines and CI workflows.</p>
+<h2>prerender()</h2>
+<p>The main entry point. Renders all routes and writes static HTML to disk. Equivalent of running <code>npx revijs</code>.</p>
+<pre><span class="kw">import</span> { prerender } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+<span class="kw">await</span> prerender({
+  routes: [<span class="st">'/'</span>, <span class="st">'/about'</span>, <span class="st">'/contact'</span>],
+  outputDir: <span class="st">'dist-prerendered'</span>,
+  distDir: <span class="st">'dist'</span>,
+  engine: <span class="st">'browser'</span>,
+  waitFor: <span class="nu">1500</span>,
+});</pre>
+<h2>renderAllPages()</h2>
+<p>Lower-level function. Accepts a fully resolved config, starts the server, boots the engine, renders all routes, tears down.</p>
+<pre><span class="kw">import</span> { renderAllPages, loadConfig } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+<span class="kw">const</span> config = <span class="kw">await</span> loadConfig(<span class="st">'revi.config.js'</span>);
+<span class="kw">await</span> renderAllPages(config);</pre>
+<h2>loadConfig()</h2>
+<p>Loads and validates <code>revi.config.js</code>, merges with defaults. Returns a fully resolved config object.</p>
+<pre><span class="kw">import</span> { loadConfig } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+<span class="kw">const</span> config = <span class="kw">await</span> loadConfig(<span class="st">'revi.config.js'</span>, {
+  debug: <span class="nu">true</span>,
+});</pre>
+<h2>isBot() / detectBot()</h2>
+<p>Check if a user-agent string belongs to a known bot. Used internally by the middleware.</p>
+<pre><span class="kw">import</span> { isBot, detectBot } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+isBot(<span class="st">'Googlebot/2.1'</span>);     <span class="cm">// true</span>
+isBot(<span class="st">'Mozilla/5.0 ...'</span>);  <span class="cm">// false</span>
+detectBot(<span class="st">'GPTBot/1.0'</span>);    <span class="cm">// 'gptbot'</span></pre>
+<h2>saveHTML()</h2>
+<p>Maps a route path to a file and writes the HTML string to disk.</p>
+<pre><span class="kw">import</span> { saveHTML } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+<span class="cm">// /about → dist-prerendered/about/index.html</span>
+<span class="kw">await</span> saveHTML(<span class="st">'/about'</span>, htmlString, <span class="st">'dist-prerendered'</span>);</pre>
+</div>
+
+<!-- MIDDLEWARE -->
+<div id="middleware" class="page">
+<h1>Middleware</h1>
+<p class="desc">Optional middleware that serves prerendered HTML to bots while passing all other requests through normally. Works with Express, Polka, and any Connect-compatible framework.</p>
+<h2>How it works</h2>
+<ol>
+  <li>A request comes in</li>
+  <li>Middleware checks the <code>User-Agent</code> header against 30+ known bot patterns</li>
+  <li>If it's a bot → reads the matching file from <code>dist-prerendered/</code> and returns it</li>
+  <li>If it's a human → calls <code>next()</code> and your app handles it normally</li>
+</ol>
+<div class="note">💡 This is completely optional. If you use a CDN or static host that handles bot routing differently, you don't need this.</div>
+<h2>Express</h2>
+<pre><span class="kw">import</span> express <span class="kw">from</span> <span class="st">'express'</span>;
+<span class="kw">import</span> { createMiddleware } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+<span class="kw">const</span> app = express();
+
+<span class="cm">// register BEFORE your static/SPA handler</span>
+app.use(createMiddleware({
+  prerenderedDir: <span class="st">'dist-prerendered'</span>,
+  debug: <span class="nu">false</span>,
+}));
+
+app.use(express.static(<span class="st">'dist'</span>));
+app.listen(<span class="nu">3000</span>);</pre>
+<h2>Polka</h2>
+<pre><span class="kw">import</span> polka <span class="kw">from</span> <span class="st">'polka'</span>;
+<span class="kw">import</span> sirv <span class="kw">from</span> <span class="st">'sirv'</span>;
+<span class="kw">import</span> { createMiddleware } <span class="kw">from</span> <span class="st">'@revijs/core'</span>;
+
+polka()
+  .use(createMiddleware({ prerenderedDir: <span class="st">'dist-prerendered'</span> }))
+  .use(sirv(<span class="st">'dist'</span>, { single: <span class="nu">true</span> }))
+  .listen(<span class="nu">3000</span>);</pre>
+<h2>Options</h2>
+<table>
+  <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>prerenderedDir</td><td>string</td><td>'dist-prerendered'</td><td>Folder with your prerendered HTML files.</td></tr>
+    <tr><td>debug</td><td>boolean</td><td>false</td><td>Log which bot matched and which file was served.</td></tr>
+  </tbody>
+</table>
+<h2>Supported bots</h2>
+<div class="chips">
+  <span class="chip">Googlebot</span><span class="chip">Bingbot</span><span class="chip">GPTBot</span><span class="chip">ClaudeBot</span>
+  <span class="chip">PerplexityBot</span><span class="chip">Yandexbot</span><span class="chip">Baiduspider</span><span class="chip">DuckDuckBot</span>
+  <span class="chip">Slurp</span><span class="chip">Twitterbot</span><span class="chip">LinkedInBot</span><span class="chip">Slackbot</span>
+  <span class="chip">Discordbot</span><span class="chip">facebookexternalhit</span><span class="chip">AhrefsBot</span><span class="chip">SemrushBot</span>
+  <span class="chip">Applebot</span><span class="chip">Amazonbot</span><span class="chip">WhatsApp</span><span class="chip">Telegrambot</span>
+  <span class="chip">Pinterest</span><span class="chip">+ more</span>
+</div>
+</div>
+
+<!-- EXAMPLES -->
+<div id="examples" class="page">
+<h1>Examples</h1>
+<p class="desc">Real-world configs for common use cases. Copy and adjust for your project.</p>
+<h2>Blog / Content site</h2>
+<pre><span class="kw">export default</span> {
+  routes: [<span class="st">'/'</span>, <span class="st">'/blog'</span>, <span class="st">'/blog/hello-world'</span>, <span class="st">'/blog/react-tips'</span>, <span class="st">'/about'</span>],
+  engine: <span class="st">'browser'</span>,
+  waitFor: <span class="nu">2000</span>, <span class="cm">// extra time for content to load</span>
+};</pre>
+<h2>E-Commerce</h2>
+<pre><span class="kw">export default</span> {
+  routes: [<span class="st">'/'</span>, <span class="st">'/products'</span>, <span class="st">'/products/sneaker-x1'</span>, <span class="st">'/categories/shoes'</span>],
+  <span class="cm">// skip /cart /checkout /account — auth-protected routes</span>
+  engine: <span class="st">'browser'</span>,
+  waitFor: <span class="nu">1500</span>,
+};</pre>
+<h2>SaaS landing page</h2>
+<pre><span class="kw">export default</span> {
+  routes: [<span class="st">'/'</span>, <span class="st">'/pricing'</span>, <span class="st">'/features'</span>, <span class="st">'/changelog'</span>],
+  <span class="cm">// /app/* and /dashboard/* intentionally skipped</span>
+  waitFor: <span class="nu">1200</span>,
+};</pre>
+<h2>Automate with npm scripts</h2>
+<pre><span class="cm">// package.json</span>
+{
+  "scripts": {
+    "build": "vite build",
+    "prerender": "npm run build && npx revijs",
+    "deploy": "npm run prerender && netlify deploy --dir=dist-prerendered"
+  }
+}</pre>
+<h2>Adjusting waitFor</h2>
+<p>If content isn't appearing in the prerendered HTML, your app needs more time. Increase <code>waitFor</code>:</p>
+<pre>waitFor: <span class="nu">1200</span>,  <span class="cm">// fast APIs</span>
+waitFor: <span class="nu">3000</span>,  <span class="cm">// slow APIs or heavy data</span>
+waitFor: <span class="nu">5000</span>,  <span class="cm">// very slow — use sparingly</span></pre>
+<h2>Debugging a route</h2>
+<p>Set <code>headless: false</code> to watch the browser open and <code>--debug</code> for verbose logs:</p>
+<pre><span class="kw">export default</span> {
+  headless: <span class="nu">false</span>,  <span class="cm">// opens a visible browser window</span>
+  routes: [<span class="st">'/problem-route'</span>],
+  waitFor: <span class="nu">3000</span>,
+};</pre>
+<pre>npx revijs --debug</pre>
+</div>
+
+</div><!-- end wrapper -->
+<script>
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  return false;
+}
+function toggleMobile(){
+  document.getElementById('mob').classList.toggle('show');
+}
+document.addEventListener('click',function(e){
+  const mob=document.getElementById('mob');
+  if(!mob.contains(e.target)&&!e.target.closest('.hamburger'))mob.classList.remove('show');
+});
+</script>
+</body>
+</html>
