@@ -79,6 +79,46 @@ export default {
 
 ---
 
+## 🤖 Supported Bots
+
+ReviJs automatically detects and serves prerendered HTML to all major crawlers.
+
+### Most Common
+| Bot | Company | Type |
+|-----|---------|------|
+| `googlebot` | Google | Search engine |
+| `bingbot` | Microsoft | Search engine |
+| `gptbot` | OpenAI | AI crawler |
+| `claudebot` | Anthropic | AI crawler |
+| `perplexitybot` | Perplexity AI | AI crawler |
+| `facebookexternalhit` | Meta | Social preview |
+| `twitterbot` | X (Twitter) | Social preview |
+| `linkedinbot` | LinkedIn | Social preview |
+| `yandexbot` | Yandex | Search engine |
+| `baiduspider` | Baidu | Search engine |
+
+<details>
+<summary>View all supported bots</summary>
+
+### Search Engines
+`googlebot` `google-inspectiontool` `bingbot` `yandexbot` `baiduspider` `duckduckbot` `slurp` `sogou` `exabot` `rogerbot` `mj12bot` `dotbot` `ia_archiver`
+
+### AI / LLM Crawlers
+`gptbot` `chatgpt-user` `claudebot` `claude-web` `anthropic-ai` `perplexitybot` `cohere-ai` `amazonbot` `applebot`
+
+### SEO Tools
+`ahrefsbot` `semrushbot` `facebot`
+
+### Social & Preview
+`facebookexternalhit` `twitterbot` `linkedinbot` `slackbot` `discordbot` `telegrambot` `whatsapp` `vkshare` `pinterest` `tumblr` `flipboard`
+
+### Generic Signals
+`spider` `crawler` `scraper`
+
+</details>
+
+> Want to add a custom bot? Use the programmatic API — `isBot()` and `detectBot()` are fully exported.
+
 ## 🧩 Middleware
 
 ```js
