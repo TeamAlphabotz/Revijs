@@ -1,3 +1,14 @@
+// setup.js
+// ──────────────────────────────────────────────────────────────
+// ReviJs Browser Engine Setup Script
+// Copyright (c) 2026 AlphaBotz & Adarsh
+// GitHub: https://github.com/TeamAlphabotz
+// GitHub: https://github.com/utkarshdubey2008
+// Telegram: @alter69x, @akanesakuramori
+// This script ensures your system has the required browser engine
+// for ReviJs prerendering
+// ──────────────────────────────────────────────────────────────
+
 import { execSync } from 'child_process';
 import pc from 'picocolors';
 
