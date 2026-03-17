@@ -1,6 +1,6 @@
 {
-  "name": "revijs",
-  "version": "0.1.0",
+  "name": "@revijs/core",
+  "version": "0.1.1",
   "description": "Local-first SPA prerender CLI tool — converts React/Vite apps into SEO-friendly static HTML",
   "type": "module",
   "main": "src/index.js",
@@ -8,6 +8,7 @@
     "revijs": "./bin/revijs.js"
   },
   "scripts": {
+    "postinstall": "npx playwright install chromium",
     "start": "node bin/revijs.js",
     "dev": "node bin/revijs.js --debug",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
