@@ -1,7 +1,7 @@
-# ⚡ ReviJs — The SPA Prerender Wizard 🧙‍♂️
+# ⚡ ReviJs 🧙‍♂️
 
-[![npm version](https://img.shields.io/npm/v/revijs?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/revijs)
-[![npm downloads](https://img.shields.io/npm/dm/revijs?style=flat-square&color=brightgreen)](https://www.npmjs.com/package/revijs)
+[![npm version](https://img.shields.io/npm/v/revijs?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/@revijs/core)
+[![npm downloads](https://img.shields.io/npm/dm/revijs?style=flat-square&color=brightgreen)](https://www.npmjs.com/package/@revijs/core)
 [![MIT License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Made by AlphaBotz](https://img.shields.io/badge/🤖%20Made%20by-AlphaBotz-blueviolet?style=flat-square)](https://github.com/TeamAlphabotz)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen?style=flat-square&logo=node.js)](https://nodejs.org/)
@@ -308,7 +308,7 @@ This project is made with ❤️ by the AlphaBotz crew:
 | Name | Role | Link |
 |------|------|------|
 | **Utkarsh Dubey** 🧑‍💻 | Core Developer | [@utkarshdubey2008](https://github.com/utkarshdubey2008) |
-| **Adarsh** 🚀 | Lead Developer | [@TeamAlphabotz](https://github.com/teamalphabotz) |
+| **Adarsh** 🚀 | Core Developer | [@TeamAlphabotz](https://github.com/teamalphabotz) |
 
 ### 🤝 Join the Community!
 
@@ -336,7 +336,7 @@ This project is made with ❤️ by the AlphaBotz crew:
 ## 📚 More Resources
 
 - 🐙 [GitHub Repository](https://github.com/TeamAlphabotz/Revijs)
-- 📦 [npm Package](https://www.npmjs.com/package/revijs)
+- 📦 [npm Package](https://www.npmjs.com/package/@revijs/core)
 - 💬 [Discord Community](#) *(coming soon)*
 - 📖 [Full Documentation](#) *(coming soon)*
 
