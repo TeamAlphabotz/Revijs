@@ -1,59 +1,25 @@
 {
   "name": "@revijs/core",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "Local-first SPA prerender CLI — convert React/Vite apps into SEO-friendly static HTML",
   "type": "module",
   "main": "./src/index.js",
-  "bin": {
-    "revijs": "./bin/revijs.js"
-  },
-
-  "files": [
-    "bin",
-    "src"
-  ],
-
+  "bin": { "revijs": "./bin/revijs.js" },
+  "files": ["bin", "src"],
   "scripts": {
     "start": "node ./bin/revijs.js",
     "dev": "node ./bin/revijs.js --debug",
     "test": "jest",
     "prepare": "node ./src/setup.js || true"
   },
-
-  "keywords": [
-    "prerender",
-    "seo",
-    "spa",
-    "react",
-    "vite",
-    "static-site",
-    "ssr",
-    "cli",
-    "headless-browser"
-  ],
-
+  "keywords": ["prerender","seo","spa","react","vite","static-site","ssr","cli","headless-browser"],
   "author": "TeamAlphaBotz & Utkarsh Dubey",
   "license": "MIT",
-
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TeamAlphabotz/Revijs.git"
-  },
-
-  "homepage": "https://github.com/TeamAlphabotz/Revijs",
-  "bugs": {
-    "url": "https://github.com/TeamAlphabotz/Revijs/issues"
-  },
-
-  "funding": {
-    "type": "individual",
-    "url": "https://t.me/alter69x"
-  },
-
-  "engines": {
-    "node": ">=18"
-  },
-
+  "repository": { "type": "git", "url": "https://github.com/TeamAlphabotz/Revijs.git" },
+  "homepage": "https://teamalphabotz.github.io/Revijs/",
+  "bugs": { "url": "https://github.com/TeamAlphabotz/Revijs/issues" },
+  "funding": { "type": "individual", "url": "https://t.me/alter69x" },
+  "engines": { "node": ">=18" },
   "dependencies": {
     "commander": "^12.1.0",
     "picocolors": "^1.0.1",
@@ -61,8 +27,5 @@
     "sirv": "^2.0.4",
     "playwright": "^1.44.0"
   },
-
-  "devDependencies": {
-    "jest": "^29.7.0"
-  }
+  "devDependencies": { "jest": "^29.7.0" }
 }

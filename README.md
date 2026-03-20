@@ -1,125 +1,214 @@
-# ⚡ ReviJs 🧙‍♂️
+# ReviJs
 
-[![npm version](https://img.shields.io/npm/v/@revijs/core?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/@revijs/core)
-[![npm downloads](https://img.shields.io/npm/dm/@revijs/core?style=flat-square&color=brightgreen)](https://www.npmjs.com/package/@revijs/core)
-[![MIT License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Made by AlphaBotz](https://img.shields.io/badge/🤖%20Made%20by-AlphaBotz-blueviolet?style=flat-square)](https://github.com/TeamAlphabotz)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen?style=flat-square&logo=node.js)](https://nodejs.org/)
-![Stars](https://img.shields.io/github/stars/TeamAlphabotz/Revijs?style=flat-square&color=yellow)
+Local-first SPA prerender CLI. Converts React/Vite apps into SEO-friendly static HTML using a headless browser. Zero cloud dependency.
 
-> 🚀 **Local-first SPA prerender CLI** — Convert your React/Vite app into blazing-fast, SEO-friendly static HTML. Zero cloud dependency. Pure magic. ✨
+[![npm](https://img.shields.io/npm/v/@revijs/core?style=flat-square)](https://www.npmjs.com/package/@revijs/core)
+[![license](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![node](https://img.shields.io/badge/node-18+-brightgreen?style=flat-square)](https://nodejs.org/)
 
----
-
-## 🔗 Quick Links
-
-- 📖 [Full Documentation](https://teamalphabotz.github.io/Revijs/)
-- 🚀 [Getting Started](https://teamalphabotz.github.io/Revijs/#start)
-- ⚙️ [Configuration](https://teamalphabotz.github.io/Revijs/#config)
-- 🔌 [API Reference](https://teamalphabotz.github.io/Revijs/#api)
-- 🧩 [Middleware](https://teamalphabotz.github.io/Revijs/#middleware)
-- 💡 [Examples](https://teamalphabotz.github.io/Revijs/#examples)
-- 🐙 [GitHub Repository](https://github.com/TeamAlphabotz/Revijs)
-- 📦 [npm Package](https://www.npmjs.com/package/@revijs/core)
+**Links:** [Documentation](https://teamalphabotz.github.io/Revijs/) · [npm](https://www.npmjs.com/package/@revijs/core) · [GitHub](https://github.com/TeamAlphabotz/Revijs)
 
 ---
 
-## 🎯 What's ReviJs?
+## How it works
 
-Tired of your fancy React/Vite app being invisible to Google? 😱 ReviJs is here to save the day!
-
-ReviJs **spins up a headless browser**, visits every route in your app, waits for data to load, and captures the fully-rendered HTML. Then it serves that pre-baked HTML to search engines while your users still get the smooth SPA experience.
-
-It's like having your cake and eating it too. 🍰
-
----
-
-## ⚙️ Requirements
-
-- **Node.js**: `>=18.0.0`
-- **npm**: `>=9.0.0` or yarn / pnpm
-- **OS**: macOS, Linux, Windows
-- A built React / Vite / Vue / Svelte app
+1. Run `npm run build` as normal
+2. Run `npx revijs`
+3. ReviJs starts a local server, opens each route in a headless browser, waits for data to load, captures the full HTML
+4. Static files are written to `dist-prerendered/`
+5. Bots get the static HTML — users get the live SPA
 
 ---
 
-## 🚀 Quick Start (30 seconds!)
+## Quick start
 
 ```bash
-# 1️⃣  Install
 npm install @revijs/core
-
-# 2️⃣  Initialize config
 npx revijs init
-
-# 3️⃣  Build your app
 npm run build
-
-# 4️⃣  Prerender!
 npx revijs
 ```
 
-**Boom!** 💥 Your static HTML is now in `dist-prerendered/`
+---
+
+## Configuration
+
+```js
+// revi.config.js
+export default {
+  routes: ['/', '/about', '/blog/post-1'],
+  engine: 'browser',        // 'browser' | 'advanced' | 'ssr'
+  outputDir: 'dist-prerendered',
+  distDir: 'dist',
+
+  // Smart wait — choose one:
+  waitFor: 1200,            // fixed delay after network idle
+  readyFlag: false,         // wait for window.__REVI_READY__ = true
+  waitForSelector: null,    // wait for a DOM element, e.g. '#app[data-loaded]'
+
+  // Route sources — choose one:
+  sitemapInput: null,       // read routes from sitemap or sitemap-index.xml
+  autoDiscover: false,      // scan dist/ and find routes automatically
+
+  // Output
+  injectMeta: true,         // auto-inject missing og: meta tags
+  sitemap: false,           // generate sitemap.xml (or set to your base URL)
+  score: true,              // print SEO score for each page after rendering
+  parallel: 1,              // number of routes to render in parallel
+
+  headless: true,
+  port: 4173,
+  debug: false,
+};
+```
+
+### All options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `routes` | `string[]` | `['/']` | Routes to prerender |
+| `engine` | `string` | `'browser'` | Rendering engine |
+| `outputDir` | `string` | `'dist-prerendered'` | Where to write HTML files |
+| `distDir` | `string` | `'dist'` | Your built SPA directory |
+| `waitFor` | `number` | `1200` | ms to wait after network idle |
+| `readyFlag` | `boolean` | `false` | Wait for `window.__REVI_READY__ = true` |
+| `waitForSelector` | `string` | `null` | Wait for a CSS selector to appear |
+| `sitemapInput` | `string` | `null` | Path or URL to sitemap or sitemap-index.xml |
+| `autoDiscover` | `boolean` | `false` | Auto-discover routes from dist/ |
+| `injectMeta` | `boolean` | `true` | Inject missing og: meta tags |
+| `sitemap` | `boolean\|string` | `false` | Generate sitemap.xml. Set to base URL for absolute URLs |
+| `score` | `boolean` | `true` | Print SEO score report after rendering |
+| `parallel` | `number` | `1` | Routes rendered in parallel |
+| `headless` | `boolean` | `true` | Run browser in background |
+| `port` | `number` | `4173` | Local server port |
+| `debug` | `boolean` | `false` | Verbose logging |
 
 ---
 
-## 🛠️ Configuration (`revi.config.js`)
+## CLI commands
 
-```js
-export default {
-  routes: ['/', '/about', '/blog/post-1'],
-  engine: 'browser',       // 'browser' | 'advanced' | 'ssr'
-  outputDir: 'dist-prerendered',
-  distDir: 'dist',
-  waitFor: 1200,           // ms after network idle
-  headless: true,
-  port: 4173,
-};
+```bash
+# Prerender all routes
+npx revijs
+
+# Generate starter config
+npx revijs init
+
+# Open dashboard UI in browser
+npx revijs ui
+
+# Deploy output to a hosting provider
+npx revijs deploy --target=netlify
+npx revijs deploy --target=vercel
+npx revijs deploy --target=cloudflare
 ```
 
 ---
 
-## 🤖 Supported Bots
+## Smart wait strategy
 
-ReviJs automatically detects and serves prerendered HTML to all major crawlers.
+Instead of guessing with a fixed timer, you can tell ReviJs exactly when your app is ready.
 
-### Most Common
-| Bot | Company | Type |
-|-----|---------|------|
-| `googlebot` | Google | Search engine |
-| `bingbot` | Microsoft | Search engine |
-| `gptbot` | OpenAI | AI crawler |
-| `claudebot` | Anthropic | AI crawler |
-| `perplexitybot` | Perplexity AI | AI crawler |
-| `facebookexternalhit` | Meta | Social preview |
-| `twitterbot` | X (Twitter) | Social preview |
-| `linkedinbot` | LinkedIn | Social preview |
-| `yandexbot` | Yandex | Search engine |
-| `baiduspider` | Baidu | Search engine |
+**Option 1 — ready flag (recommended)**
 
-<details>
-<summary>View all supported bots</summary>
+In your app, set a flag when data is fully loaded:
 
-### Search Engines
-`googlebot` `google-inspectiontool` `bingbot` `yandexbot` `baiduspider` `duckduckbot` `slurp` `sogou` `exabot` `rogerbot` `mj12bot` `dotbot` `ia_archiver`
+```js
+useEffect(() => {
+  fetchData().then(() => {
+    window.__REVI_READY__ = true;
+  });
+}, []);
+```
 
-### AI / LLM Crawlers
-`gptbot` `chatgpt-user` `claudebot` `claude-web` `anthropic-ai` `perplexitybot` `cohere-ai` `amazonbot` `applebot`
+In config:
+```js
+readyFlag: true,
+waitFor: 0,
+```
 
-### SEO Tools
-`ahrefsbot` `semrushbot` `facebot`
+**Option 2 — wait for selector**
 
-### Social & Preview
-`facebookexternalhit` `twitterbot` `linkedinbot` `slackbot` `discordbot` `telegrambot` `whatsapp` `vkshare` `pinterest` `tumblr` `flipboard`
+```js
+waitForSelector: '#app[data-loaded="true"]',
+```
 
-### Generic Signals
-`spider` `crawler` `scraper`
+---
 
-</details>
+## Auto route discovery
 
-> Want to add a custom bot? Use the programmatic API — `isBot()` and `detectBot()` are fully exported.
+Let ReviJs find your routes automatically instead of listing them manually:
 
-## 🧩 Middleware
+```js
+autoDiscover: true,
+```
+
+It scans `dist/` for existing HTML files and extracts links from your built app.
+
+---
+
+## Sitemap support
+
+Read routes from an existing sitemap (supports `sitemap-index.xml`):
+
+```js
+sitemapInput: 'https://yoursite.com/sitemap-index.xml',
+```
+
+Generate a `sitemap.xml` after prerendering:
+
+```js
+sitemap: 'https://yoursite.com',
+```
+
+---
+
+## SEO scoring
+
+After each render, ReviJs scores the HTML and prints a report:
+
+```
+  SEO Scores
+  ────────────────────────────────────────────
+  100%   /
+   80%   /about
+   60%   /blog/post-1
+           missing: og:image, meta description
+  ────────────────────────────────────────────
+  avg 80%
+```
+
+Checks: title, meta description, og:title, og:description, og:image, h1 presence, image alt attributes, canonical link, lang attribute.
+
+---
+
+## Deploy
+
+Deploy your prerendered output directly from the CLI:
+
+```bash
+npx revijs deploy --target=netlify
+npx revijs deploy --target=vercel
+npx revijs deploy --target=cloudflare
+```
+
+Requires the respective CLI to be installed (`netlify-cli`, `vercel`, `wrangler`).
+
+---
+
+## Dashboard
+
+```bash
+npx revijs ui
+```
+
+Opens a local web dashboard at `http://localhost:4200` showing render status, time per route, SEO scores, and errors.
+
+---
+
+## Middleware
+
+Serve prerendered HTML to bots while real users get the live SPA:
 
 ```js
 import express from 'express';
@@ -133,7 +222,7 @@ app.listen(3000);
 
 ---
 
-## 🤖 Programmatic API
+## Programmatic API
 
 ```js
 import { prerender } from '@revijs/core';
@@ -141,32 +230,67 @@ import { prerender } from '@revijs/core';
 await prerender({
   routes: ['/', '/about'],
   outputDir: 'dist-prerendered',
+  score: true,
+  injectMeta: true,
 });
 ```
 
 ---
 
-## 👨‍💻 Team
+## Supported bots
 
-| Name | Role | Link |
-|------|------|------|
-| **Utkarsh Dubey** 🧑‍💻 | Core Developer | [@utkarshdubey2008](https://github.com/utkarshdubey2008) |
-| **Adarsh** 🚀 | Core Developer | [@TeamAlphabotz](https://github.com/teamalphabotz) |
+### Most common
+| Bot | Company | Type |
+|-----|---------|------|
+| `googlebot` | Google | Search |
+| `bingbot` | Microsoft | Search |
+| `gptbot` | OpenAI | AI |
+| `claudebot` | Anthropic | AI |
+| `perplexitybot` | Perplexity | AI |
+| `facebookexternalhit` | Meta | Social |
+| `twitterbot` | X | Social |
+| `linkedinbot` | LinkedIn | Social |
 
-💬 **Telegram**: [@thealphabotz](https://t.me/thealphabotz) · [@alphabotzchat](https://t.me/alphabotzchat)
+<details>
+<summary>View all supported bots</summary>
+
+**Search engines**
+`googlebot` `google-inspectiontool` `bingbot` `yandexbot` `baiduspider` `duckduckbot` `slurp` `sogou` `exabot` `rogerbot` `mj12bot` `dotbot` `ia_archiver`
+
+**AI crawlers**
+`gptbot` `chatgpt-user` `claudebot` `claude-web` `anthropic-ai` `perplexitybot` `cohere-ai` `amazonbot` `applebot`
+
+**SEO tools**
+`ahrefsbot` `semrushbot`
+
+**Social / preview**
+`facebookexternalhit` `twitterbot` `linkedinbot` `slackbot` `discordbot` `telegrambot` `whatsapp` `vkshare` `pinterest` `tumblr` `flipboard`
+
+</details>
 
 ---
 
-## 📄 License
+## More resources
 
-[MIT License](LICENSE) — Use freely! ✅
+- [Documentation](https://teamalphabotz.github.io/Revijs/)
+- [Getting started](https://teamalphabotz.github.io/Revijs/#start)
+- [Configuration](https://teamalphabotz.github.io/Revijs/#config)
+- [API reference](https://teamalphabotz.github.io/Revijs/#api)
+- [Middleware](https://teamalphabotz.github.io/Revijs/#middleware)
+- [Examples](https://teamalphabotz.github.io/Revijs/#examples)
+- [npm package](https://www.npmjs.com/package/@revijs/core)
 
 ---
 
-<div align="center">
+## Team
 
-### Made with 💜 by AlphaBotz
+| Name | Role |
+|------|------|
+| [Utkarsh Dubey](https://github.com/utkarshdubey2008) | Core Developer |
+| [Adarsh](https://github.com/teamalphabotz) | Core Developer |
 
-*Where bots meet brilliance* 🤖✨
+Telegram: [@thealphabotz](https://t.me/thealphabotz) · [@alphabotzchat](https://t.me/alphabotzchat)
 
-</div>
+---
+
+MIT License

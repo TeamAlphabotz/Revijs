@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ReviJs Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;font-size:14px;line-height:1.6}
+.header{background:#161b22;border-bottom:1px solid #30363d;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:700;font-size:1rem}
+.logo span{color:#7c3aed}
+.main{max-width:960px;margin:0 auto;padding:1.5rem}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;margin-bottom:.75rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:6px;font-size:.875rem;font-weight:600;border:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-green{background:#238636;color:#fff}
+.btn-gray{background:#21262d;color:#e6edf3;border:1px solid #30363d}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.status-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:100px;font-size:.75rem;font-weight:600}
+.s-idle{background:#21262d;color:#8b949e}
+.s-running{background:#1f3a1f;color:#3fb950}
+.s-done{background:#0f2a1f;color:#3fb950}
+.s-error{background:#3a1f1f;color:#f85149}
+.routes{display:grid;gap:.5rem;margin-top:.5rem}
+.route-row{display:flex;align-items:center;justify-content:space-between;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:.5rem .75rem;font-family:monospace;font-size:.82rem}
+.route-score{font-family:monospace;font-size:.78rem;padding:.15rem .4rem;border-radius:4px}
+.sc-green{background:#0f2a1f;color:#3fb950}
+.sc-yellow{background:#2a240f;color:#d29922}
+.sc-red{background:#3a1f1f;color:#f85149}
+.route-time{color:#8b949e;font-size:.75rem}
+.route-miss{color:#8b949e;font-size:.72rem;margin-top:.15rem}
+.config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.5rem}
+.config-item{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:.5rem .75rem}
+.config-key{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.04em}
+.config-val{font-family:monospace;font-size:.82rem;color:#79c0ff;margin-top:.1rem}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid #3fb950;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.top-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">⚡ <span>Revi</span>Js Dashboard</div>
+  <div id="statusBadge" class="status-badge s-idle">Idle</div>
+</div>
+<div class="main">
+  <div class="top-row">
+    <button class="btn btn-green" id="runBtn" onclick="startRender()">▶ Run Prerender</button>
+    <button class="btn btn-gray" onclick="loadStatus()">↻ Refresh</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Config</div>
+    <div class="config-grid" id="configGrid">—</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Routes</div>
+    <div id="routesList"><span style="color:#8b949e">Run prerender to see results.</span></div>
+  </div>
+</div>
+
+<script>
+async function loadStatus() {
+  const r = await fetch('/api/status').then(r => r.json());
+  updateBadge(r.status);
+  renderConfig(r.config);
+  if (r.results) renderResults(r.results);
+  document.getElementById('runBtn').disabled = r.status === 'running';
+}
+
+async function startRender() {
+  document.getElementById('runBtn').disabled = true;
+  updateBadge('running');
+  await fetch('/api/render', { method: 'POST' });
+  poll();
+}
+
+function poll() {
+  const t = setInterval(async () => {
+    const r = await fetch('/api/status').then(r => r.json());
+    updateBadge(r.status);
+    if (r.results) renderResults(r.results);
+    if (r.status !== 'running') {
+      clearInterval(t);
+      document.getElementById('runBtn').disabled = false;
+    }
+  }, 1000);
+}
+
+function updateBadge(status) {
+  const b = document.getElementById('statusBadge');
+  const map = { idle: ['s-idle','Idle'], running: ['s-running',''], done: ['s-done','Done'], error: ['s-error','Error'] };
+  const [cls, label] = map[status] || map.idle;
+  b.className = 'status-badge ' + cls;
+  b.innerHTML = status === 'running' ? '<span class="spinner"></span> Running' : label;
+}
+
+function renderConfig(cfg) {
+  if (!cfg) return;
+  const el = document.getElementById('configGrid');
+  el.innerHTML = Object.entries(cfg).map(([k,v]) =>
+    `<div class="config-item"><div class="config-key">${k}</div><div class="config-val">${Array.isArray(v) ? v.length + ' routes' : v}</div></div>`
+  ).join('');
+}
+
+function renderResults(results) {
+  const el = document.getElementById('routesList');
+  if (results.error) { el.innerHTML = `<span style="color:#f85149">${results.error}</span>`; return; }
+  if (!results.scores && !results.renderTimes) { el.innerHTML = '<span style="color:#3fb950">Complete.</span>'; return; }
+
+  const scoreMap = {};
+  (results.scores || []).forEach(s => scoreMap[s.route] = s);
+
+  const rows = (results.renderTimes || []).map(({ route, ms }) => {
+    const s = scoreMap[route];
+    const scoreHtml = s ? `<span class="route-score ${s.score>=80?'sc-green':s.score>=50?'sc-yellow':'sc-red'}">${s.score}%</span>` : '';
+    const miss = s && s.failed.length ? `<div class="route-miss">missing: ${s.failed.join(', ')}</div>` : '';
+    return `<div><div class="route-row">${route}<div style="display:flex;gap:.5rem;align-items:center">${scoreHtml}<span class="route-time">${ms}ms</span></div></div>${miss}</div>`;
+  });
+
+  el.innerHTML = rows.length ? `<div class="routes">${rows.join('')}</div>` : '<span style="color:#8b949e">No results yet.</span>';
+}
+
+loadStatus();
+setInterval(loadStatus, 5000);
+</script>
+</body>
+</html>
