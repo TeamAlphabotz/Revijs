@@ -1,4 +1,4 @@
-# ReviJs
+## ReviJs
 
 Local-first SPA prerender CLI. Converts React/Vite apps into SEO-friendly static HTML using a headless browser. Zero cloud dependency.
 
