@@ -17,9 +17,13 @@ const DEFAULTS = {
   port: 4173,
   debug: false,
   injectMeta: true,
+  injectHead: null,
   score: true,
   sitemap: false,
   parallel: 1,
+  cache: false,
+  retries: 2,
+  report: true,
 };
 
 export async function loadConfig(configPath = 'revi.config.js', overrides = {}) {
@@ -52,19 +56,33 @@ export async function scaffoldConfig() {
 
   await fs.writeFile(dest, `// revi.config.js
 export default {
-  routes: ['/', '/about', '/blog/post-1'],
+  routes: ['/', '/about'],
   engine: 'browser',
   outputDir: 'dist-prerendered',
   distDir: 'dist',
+
+  // Smart wait — choose one:
   waitFor: 1200,
   readyFlag: false,
   waitForSelector: null,
+
+  // Route sources:
+  sitemapInput: null,
+  autoDiscover: false,
+
+  // Output:
+  injectMeta: true,
+  injectHead: null,
+  sitemap: false,
+  score: true,
+  report: true,
+  cache: false,
+  retries: 2,
+  parallel: 1,
+
   headless: true,
   port: 4173,
-  injectMeta: true,
-  score: true,
-  sitemap: false,
-  parallel: 1,
+  debug: false,
 };
 `);
   console.log(pc.green('  Created revi.config.js'));
@@ -72,13 +90,12 @@ export default {
 
 function validateConfig(config) {
   if (!Array.isArray(config.routes) || config.routes.length === 0) {
-    throw new Error('config.routes must be a non-empty array.');
+    if (!config.sitemapInput && !config.autoDiscover) {
+      throw new Error('config.routes must be a non-empty array, or set sitemapInput / autoDiscover.');
+    }
   }
   if (!['browser', 'advanced', 'ssr'].includes(config.engine)) {
     throw new Error(`config.engine must be browser | advanced | ssr. Got: "${config.engine}"`);
-  }
-  if (typeof config.waitFor !== 'number' || config.waitFor < 0) {
-    throw new Error('config.waitFor must be a non-negative number.');
   }
 }
 

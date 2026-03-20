@@ -1,6 +1,6 @@
 {
   "name": "@revijs/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Local-first SPA prerender CLI — convert React/Vite apps into SEO-friendly static HTML",
   "type": "module",
   "main": "./src/index.js",
@@ -13,7 +13,7 @@
     "prepare": "node ./src/setup.js || true"
   },
   "keywords": ["prerender","seo","spa","react","vite","static-site","ssr","cli","headless-browser"],
-  "author": "TeamAlphaBotz & Utkarsh",
+  "author": "TeamAlphaBotz & Utkarsh Dubey",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/TeamAlphabotz/Revijs.git" },
   "homepage": "https://teamalphabotz.github.io/Revijs/",

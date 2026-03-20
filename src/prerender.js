@@ -9,21 +9,27 @@ import { expandRoutes } from './utils/route-expander.js';
 import { injectMeta } from './utils/meta-injector.js';
 import { scoreHTML } from './utils/score.js';
 import { generateSitemap } from './utils/sitemap.js';
+import { loadCache, saveCache, isCached, updateCache, readCachedHTML } from './utils/cache.js';
+import { saveReport } from './utils/report.js';
 
 export async function renderAllPages(config) {
-  const { routes, outputDir, distDir, port, debug, injectMeta: doMeta, score: doScore, sitemap, parallel = 1 } = config;
+  const {
+    routes, outputDir, distDir, port, debug,
+    injectMeta: doMeta, injectHead,
+    score: doScore, sitemap,
+    parallel = 1, cache: useCache,
+    retries = 2, report: doReport,
+  } = config;
 
   const expandedRoutes = await expandRoutes(routes);
   const { url, close } = await startServer(distDir, port);
-  if (debug) console.log(pc.dim(`  Server: ${url}`));
-
   const engine = await getEngine(config);
   await fs.mkdir(outputDir, { recursive: true });
 
-  const results = { ok: 0, failed: 0, scores: [], renderTimes: [] };
+  const cacheStore = useCache ? await loadCache(outputDir) : {};
+  const results = { ok: 0, failed: 0, skipped: 0, scores: [], renderTimes: [], errors: [] };
 
   try {
-    // Render in batches based on parallel setting
     const batches = chunkArray(expandedRoutes, Math.max(1, parallel));
 
     for (const batch of batches) {
@@ -32,54 +38,95 @@ export async function renderAllPages(config) {
         const start = Date.now();
         process.stdout.write(pc.dim(`  ${route} ... `));
 
-        try {
-          let html = await renderPage(pageUrl, engine, config);
+        let html = null;
+        let attempt = 0;
+        let lastErr = null;
 
-          if (doMeta) html = injectMeta(html, route);
-
-          await saveHTML(route, html, outputDir);
-
-          const ms = Date.now() - start;
-          results.renderTimes.push({ route, ms });
-          console.log(pc.green('✔') + pc.dim(` ${ms}ms`));
-
-          if (doScore) {
-            results.scores.push(scoreHTML(html, route));
+        // Retry loop
+        while (attempt <= retries) {
+          try {
+            html = await renderPage(pageUrl, engine, config);
+            break;
+          } catch (err) {
+            lastErr = err;
+            attempt++;
+            if (attempt <= retries) {
+              await new Promise(r => setTimeout(r, 500 * attempt));
+            }
           }
-
-          results.ok++;
-        } catch (err) {
-          console.log(pc.red('✖'));
-          console.error(pc.red(`    ${err.message}`));
-          if (debug) console.error(err.stack);
-          results.failed++;
         }
+
+        if (!html) {
+          console.log(pc.red(`✖ (${retries} retries)`));
+          console.error(pc.red(`    ${lastErr.message}`));
+          results.failed++;
+          results.errors.push({ route, error: lastErr.message });
+          return;
+        }
+
+        // Check cache — skip if unchanged
+        if (useCache) {
+          const cached = await readCachedHTML(route, outputDir);
+          if (cached && await isCached(route, html, cacheStore)) {
+            console.log(pc.dim('↩ cached'));
+            results.skipped++;
+            if (doScore) results.scores.push(scoreHTML(cached, route));
+            results.renderTimes.push({ route, ms: Date.now() - start });
+            return;
+          }
+        }
+
+        // Inject meta tags
+        if (doMeta) html = injectMeta(html, route);
+
+        // Inject custom head HTML
+        if (injectHead) {
+          html = html.replace('</head>', `  ${injectHead}\n</head>`);
+        }
+
+        await saveHTML(route, html, outputDir);
+
+        if (useCache) updateCache(route, html, cacheStore);
+
+        const ms = Date.now() - start;
+        results.renderTimes.push({ route, ms });
+        console.log(pc.green('✔') + pc.dim(` ${ms}ms`));
+
+        if (doScore) results.scores.push(scoreHTML(html, route));
+        results.ok++;
       }));
     }
   } finally {
     await engine.close();
     await close();
+    if (useCache) await saveCache(outputDir, cacheStore);
   }
 
-  // Sitemap generation
+  // Sitemap
   if (sitemap) {
     const baseUrl = typeof sitemap === 'string' ? sitemap : '';
-    const sitemapPath = await generateSitemap(expandedRoutes, outputDir, baseUrl);
-    console.log(pc.dim(`  Sitemap: ${sitemapPath}`));
+    const dest = await generateSitemap(expandedRoutes, outputDir, baseUrl);
+    console.log(pc.dim(`  Sitemap: ${dest}`));
   }
 
   // Score report
-  if (doScore && results.scores.length > 0) {
-    printScores(results.scores);
+  if (doScore && results.scores.length > 0) printScores(results.scores);
+
+  // JSON report
+  if (doReport) {
+    const dest = await saveReport(results, outputDir);
+    console.log(pc.dim(`  Report: ${dest}`));
   }
 
-  const summary = `\n  ${pc.green(`${results.ok} rendered`)}` +
+  const skippedStr = results.skipped > 0 ? pc.dim(`, ${results.skipped} cached`) : '';
+  console.log(
+    `\n  ${pc.green(`${results.ok} rendered`)}` +
     (results.failed > 0 ? pc.red(`, ${results.failed} failed`) : '') +
-    `  →  ${pc.cyan(outputDir)}`;
-  console.log(summary);
+    skippedStr +
+    `  →  ${pc.cyan(outputDir)}\n`
+  );
 
   if (results.failed > 0) throw new Error(`${results.failed} route(s) failed.`);
-
   return results;
 }
 
@@ -96,7 +143,6 @@ export async function saveHTML(route, html, outputDir) {
   const filePath = route === '/'
     ? path.join(outputDir, 'index.html')
     : path.join(outputDir, route.replace(/^\//, ''), 'index.html');
-
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, html, 'utf8');
 }
